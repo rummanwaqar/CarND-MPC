@@ -1,5 +1,7 @@
 #include "io.hpp"
-#include "helpers.hpp"
+
+// MPH to M/S
+inline double mph2ms(double x) { return x / 2.237; }
 
 SimIO::SimIO(int port, ProcessCb cb) : port_(port), callbackFunc_(cb) {
   /*
@@ -9,8 +11,9 @@ SimIO::SimIO(int port, ProcessCb cb) : port_(port), callbackFunc_(cb) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
-    if (length && length > 2 && data[0] == '4' && data[1] == '2') {
-      std::string s = hasData(std::string(data));
+    std::string sdata = std::string(data).substr(0, length);
+    if (sdata.size() > 2 && sdata[0] == '4' && sdata[1] == '2') {
+      std::string s = hasData(sdata);
 
       if(s != "") { // data available
         // parse json
@@ -24,8 +27,10 @@ SimIO::SimIO(int port, ProcessCb cb) : port_(port), callbackFunc_(cb) {
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = mph2ms(j[1]["speed"]);
+          double delta= j[1]["steering_angle"];
+          double a = j[1]["throttle"];
 
-          auto output = callbackFunc_(ptsx, ptsy, px, py, psi, v);
+          auto output = callbackFunc_(ptsx, ptsy, px, py, psi, v, delta, a);
 
           nlohmann::json msgJson;
           // steer value has to be between -1 to 1 for divide by 25 degrees in rads
@@ -38,14 +43,9 @@ SimIO::SimIO(int port, ProcessCb cb) : port_(port), callbackFunc_(cb) {
           msgJson["next_x"] = output.next_x_vals;
           msgJson["next_y"] = output.next_y_vals;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          // Latency
-          // The purpose is to mimic real driving conditions where
-          //   the car does actuate the commands instantly.
-          //
-          // Feel free to play around with this value but should be to drive
-          //   around the track with 100ms latency.
-          //
-          // NOTE: REMEMBER TO SET THIS TO 100 MILLISECONDS BEFORE SUBMITTING.
+
+          // Latency - purpose is to mimic real driving conditions where the
+          // car does actuate the commands instantly.
           std::this_thread::sleep_for(std::chrono::milliseconds(100));
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }

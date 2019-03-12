@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HELPERS_H_
+#define HELPERS_H_
 
 #include <cmath>
 #include <string>
@@ -10,13 +11,9 @@ constexpr double pi() { return M_PI; }
 double deg2rad(double x) { return x * pi() / 180; }
 double rad2deg(double x) { return x * 180 / pi(); }
 
-// MPH to M/S
-inline double mph2ms(double x) { return x / 2.237; }
-
 /*
  * Helper functions to fit and evaluate polynomials.
  */
-
 // Evaluate a polynomial.
 double polyeval(const Eigen::VectorXd &coeffs, double x) {
   double result = 0.0;
@@ -50,3 +47,5 @@ Eigen::VectorXd polyfit(const Eigen::VectorXd &xvals, const Eigen::VectorXd &yva
 
   return result;
 }
+
+#endif

@@ -24,7 +24,7 @@ struct SimOutput {
  * @return tuple(steering, throttle, mpc_x, mpc_y, next_x, next_y)
  */
 typedef std::function< SimOutput(std::vector<double> ptsx, std::vector<double> ptsy,
-  double px, double py, double psi, double v) > ProcessCb;
+  double px, double py, double psi, double v, double delta, double a) > ProcessCb;
 
 /*
  * Interface to simulator
