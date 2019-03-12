@@ -7,14 +7,13 @@ const size_t N = 10;
 const double dt = 0.1;
 
 // reference velocity
-const double ref_v = 40.0; //m/s
+const double ref_v = 30.0; //m/s
 
 // simulation used to figure this out
 const double Lf = 2.67;
 
 // cost weights
-// const double costs[] = {3000, 3000, 1, 5, 5, 700, 200, 10};
-const double costs[] = {1, 1, 1, 1, 1, 0, 1, 1};
+const double costs[] = {100, 10, 40, 10, 5, 100, 400, 1};
 
 // The solver takes all the state variables and actuator
 // variables in a singular vector. Thus, we should to establish
@@ -110,15 +109,6 @@ public:
     }
   }
 };
-
-// class FG_eval {
-//  public:
-//   // Fitted polynomial coefficients
-//   Eigen::VectorXd coeffs;
-//   FG_eval(Eigen::VectorXd coeffs) { this->coeffs = coeffs; }
-//
-//
-// };
 
 std::vector<double> MPC::solve(const Eigen::VectorXd &x0,
   const Eigen::VectorXd &coeffs) {
